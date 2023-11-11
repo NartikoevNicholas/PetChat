@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    container_name: postgres
+    env_file:
+      - '.env'
+    ports:
+      - '5432:${POSTGRES_PORT}'
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+
+  redis:
+    image: redis
+    restart: always
+    container_name: redis
+    env_file:
+      - '.env'
+    ports:
+      - '6379:${REDIS_PORT}'
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    container_name: rabbitmq
+    env_file:
+      - '.env'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+
+  consumer:
+    build: 'consumer/'
+    restart: always
+    container_name: consumer
+    depends_on:
+      rabbitmq:
+        condition: service_healthy

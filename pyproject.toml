@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "backend petchat"
+version = "0.0.1"
+description = "pet project"
+authors = ["NicholasNartikoev <nartikoevnikolai@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic-settings = "^2.0.3"
+fastapi = "^0.104.1"
+uvicorn = "^0.24.0.post1"
+sqlalchemy = "^2.0.23"
+sqlalchemy-utils = "^0.41.1"
+asyncpg = "^0.29.0"
+psycopg2-binary = "^2.9.9"
+alembic = "^1.12.1"
+aio-pika = "^9.3.0"
+redis = "^5.0.1"
+pydantic = {extras = ["email"], version = "^2.4.2"}
+dependency-injector = "^4.41.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
