@@ -3,10 +3,13 @@ from dependency_injector import containers, providers
 from src.services.uow import (
     RedisUOW,
     RabbitmqUOW,
-    UserUseCaseRepositoryUOW,
+    UserServiceRepositoryUOW,
 )
 
-from src.services.use_case import UserUseCase
+from src.services.use_case import (
+    UserService,
+    RateLimiterService
+)
 
 from .redis_core import get_async_redis_client
 from .sqlalchemy_core import get_async_session
@@ -14,12 +17,7 @@ from .rabbitmq_core import get_rabbitmq_channel
 
 
 class Container(containers.DeclarativeContainer):
-    wiring_config = containers.WiringConfiguration(
-        packages=[
-            'src.endpoints.api',
-            'src.services.use_case'
-        ]
-    )
+    wiring_config = containers.WiringConfiguration(packages=['src.endpoints'])
     config = providers.Configuration()
 
     # connection to interface
@@ -37,15 +35,20 @@ class Container(containers.DeclarativeContainer):
         channel=rabbitmq_channel
     )
     user_repository_uow = providers.Factory(
-        UserUseCaseRepositoryUOW,
+        UserServiceRepositoryUOW,
         async_session=sqlalchemy_async_sessionmaker
     )
 
     # use case
-    user_use_case: UserUseCase = providers.Factory(
-        UserUseCase,
+    user_service: UserService = providers.Factory(
+        UserService,
         config=config,
-        memory_storage_uow=redis_uow,
-        user_repository_uow=user_repository_uow,
+        memory_uow=redis_uow,
+        repository_uow=user_repository_uow,
         broker_uow=rabbitmq_uow
+    )
+    rate_limiter_service: RateLimiterService = providers.Factory(
+        RateLimiterService,
+        config=config,
+        memory_uow=redis_uow,
     )

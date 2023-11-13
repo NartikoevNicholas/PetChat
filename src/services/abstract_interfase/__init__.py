@@ -1,5 +1,8 @@
 from .abstract_broker import AbstractBroker
-from .abstract_memory_storage import AbstractMemoryStorage
+from .abstract_memory_storage import (
+    SetType,
+    AbstractMemoryStorage
+)
 from .abstract_repository import (
     AbstractRepository,
     AbstractUserRepository,
@@ -9,6 +12,7 @@ from .abstract_repository import (
 
 __all__ = [
     'AbstractBroker',
+    'SetType',
     'AbstractMemoryStorage',
     'AbstractRepository',
     'AbstractUserRepository',

@@ -90,6 +90,7 @@ class DefaultSettings(Settings):
     EXPIRE_TIME: int
     LENGTH_USER_CODE: int
     REDIRECT_AFTER_VERIFY_EMAIL: str
+    REQUEST_PER_SECOND: int
 
     # fastapi
     PROJECT_NAME: str

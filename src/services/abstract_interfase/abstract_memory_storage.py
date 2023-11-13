@@ -3,15 +3,20 @@ from abc import (
     abstractmethod
 )
 
-from typing import (
-    Any,
-    Union
-)
+from typing import Union
+
+
+SetType = Union[str, bytes, bytearray]
 
 
 class AbstractMemoryStorage(ABC):
+
     @abstractmethod
-    async def set(self, name: str, value: Union[str, bytes, bytearray], ex: int = None) -> None:
+    async def get_time(self) -> float:
+        pass
+
+    @abstractmethod
+    async def set(self, name: str, value: SetType, ex: int = None) -> None:
         pass
 
     @abstractmethod

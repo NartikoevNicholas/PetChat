@@ -1,12 +1,10 @@
-from typing import (
-    Any,
-    Union
-)
-
 from redis.asyncio import Redis
 from redis.asyncio.client import Pipeline
 
-from src.services.abstract_interfase import AbstractMemoryStorage
+from src.services.abstract_interfase import (
+    SetType,
+    AbstractMemoryStorage
+)
 
 
 class RedisMemoryStorage(AbstractMemoryStorage):
@@ -14,7 +12,14 @@ class RedisMemoryStorage(AbstractMemoryStorage):
         self.redis = redis
         self.pipeline = pipeline
 
-    async def set(self, name: str, value: Union[str, bytes, bytearray], ex: int = None) -> None:
+    def lock(self, name: str, timeout: int = 5):
+        self.redis.lock(f'Lock:{name}', timeout)
+
+    async def get_time(self) -> float:
+        t = await self.redis.time()
+        return float(f'{t[0]}.{t[1]}')
+
+    async def set(self, name: str, value: SetType, ex: int = None) -> None:
         if ex and ex > 0:
             await self.pipeline.set(name=name, value=value, ex=ex)
         else:

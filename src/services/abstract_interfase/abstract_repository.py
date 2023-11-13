@@ -23,7 +23,6 @@ class AbstractRepository(ABC):
     pydantic_model: BaseModel
     pydantic_create_model: BaseModel
 
-
     @abstractmethod
     async def add(self, schema: 'pydantic_create_model') -> 'pydantic_model':
         pass

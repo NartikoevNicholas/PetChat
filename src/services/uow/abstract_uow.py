@@ -58,6 +58,6 @@ class AbstractBrokerUOW(AbstractUOW, ABC):
     broker: abstract_interfase.AbstractBroker
 
 
-class AbstractUserUseCaseRepositoryUOW(SQLAlchemyAdapterUOW, ABC):
+class AbstractUserServiceRepositoryUOW(SQLAlchemyAdapterUOW, ABC):
     user: abstract_interfase.AbstractUserRepository
     user_history: abstract_interfase.AbstractUserHistoryRepository

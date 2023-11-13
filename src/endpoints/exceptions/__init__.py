@@ -1,6 +1,8 @@
-from .exceptions import DuplicateHTTPException
+from .many_request_exception import ManyRequestsHTTPException
+from .duplicate_exception import DuplicateHTTPException
 
 
 __all__ = [
-    DuplicateHTTPException
+    'ManyRequestsHTTPException',
+    'DuplicateHTTPException'
 ]

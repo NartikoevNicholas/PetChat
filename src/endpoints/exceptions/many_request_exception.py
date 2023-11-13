@@ -1,15 +1,14 @@
-import json
 from fastapi import status
 from fastapi.exceptions import HTTPException
 
 
-class DuplicateHTTPException(HTTPException):
+class ManyRequestsHTTPException(HTTPException):
     def __init__(
         self,
-        content: str,
-        headers=None,
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
-    ) -> None:
+        content: str = 'Too many request',
+        headers: dict = None,
+        status_code: int = status.HTTP_429_TOO_MANY_REQUESTS
+    ):
         content = {
             'detail': [
                 {

@@ -10,4 +10,5 @@ router = APIRouter(
     path='/pong'
 )
 async def ping():
+    print('1')
     return {'msg': 'pong'}
