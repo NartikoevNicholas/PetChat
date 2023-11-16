@@ -5,6 +5,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from src.core.config import get_config
 from src.core.containers import Container
+from src.endpoints.api import v1_routers
+from src.endpoints.middlewares import middlewares
 
 
 config = get_config()
@@ -12,21 +14,19 @@ config = get_config()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    container = Container()
-    container.config.from_dict(config.model_dump())
+    Container()
     yield
 
 
 def bind_routers(app: FastAPI) -> None:
-    from .endpoints.api import routers
-
-    for router in routers:
-        app.include_router(router)
+    for router in v1_routers:
+        app.include_router(
+            router=router,
+            prefix='/v1'
+        )
 
 
 def bind_middleware(app: FastAPI) -> None:
-    from .endpoints.middlewares import middlewares
-
     for middleware in middlewares:
         app.add_middleware(
             middleware_class=BaseHTTPMiddleware,

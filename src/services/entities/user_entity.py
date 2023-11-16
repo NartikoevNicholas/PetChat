@@ -1,33 +1,55 @@
 import datetime
-
+import typing as tp
 from uuid import UUID
-
-from typing import Optional
 
 from pydantic import (
     BaseModel,
     EmailStr,
     Field,
-    ConfigDict
+    ConfigDict,
+    field_validator
 )
 
+from src.core.config import get_config
 
-class UserEntity(BaseModel):
+
+settings = get_config()
+
+
+class User(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: Optional[UUID] = None
-    username: Optional[str] = None
-    email: Optional[EmailStr] = None
-    hashed_password: Optional[str] = None
-    is_active: Optional[bool] = None
-    is_deleted: Optional[bool] = None
-    is_superuser: Optional[bool] = None
-    dt_update: Optional[datetime.datetime] = None
-    dt_created: Optional[datetime.datetime] = None
+    id: tp.Optional[UUID] = None
+    username: tp.Optional[str] = None
+    email: tp.Optional[EmailStr] = None
+    hashed_password: tp.Optional[str] = None
+    is_active: tp.Optional[bool] = None
+    is_deleted: tp.Optional[bool] = None
+    is_superuser: tp.Optional[bool] = None
+    dt_update: tp.Optional[datetime.datetime] = None
+    dt_created: tp.Optional[datetime.datetime] = None
 
 
-class UserCreateEntity(BaseModel):
+class UserEmail(BaseModel):
+    email: EmailStr = Field(min_length=8, max_length=39)
+
+
+class UserUsername(BaseModel):
     username: str = Field(min_length=8, max_length=39)
-    email: EmailStr
-    hashed_password: str = Field(alias='password')
+
+
+class UserCredEmail(UserEmail):
+    password: str = Field(min_length=8, max_length=39)
+
+
+class UserCredUsername(UserUsername):
+    password: str = Field(min_length=8, max_length=39)
+
+
+class UserDTO(UserEmail, UserUsername):
+    hashed_password: str = Field(alias='password', min_length=8, max_length=39)
     is_superuser: bool
+
+    @field_validator('hashed_password')
+    def check_hashed_password(cls, value):
+        return settings.pwd_context().hash(value)

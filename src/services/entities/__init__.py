@@ -1,20 +1,38 @@
 from .user_entity import (
-    UserEntity,
-    UserCreateEntity
+    User,
+    UserDTO,
+    UserEmail,
+    UserUsername,
+    UserCredEmail,
+    UserCredUsername,
 )
 from .user_history_entity import (
-    UserHistoryEntity,
-    UserHistoryCreateEntity
+    UserHistory,
+    UserHistoryDTO
 )
 from .broker_entity import (
-    BrokerUserEmailEntity
+    BrokerUserEmail
+)
+from .auth_entity import (
+    JWTToken,
+    JWTRefreshToken,
+    JWTTypeToken,
+    JWTPayload
 )
 
 
 __all__ = [
-    'UserEntity',
-    'UserCreateEntity',
-    'UserHistoryEntity',
-    'UserHistoryCreateEntity',
-    'BrokerUserEmailEntity'
+    'User',
+    'UserDTO',
+    'UserEmail',
+    'UserUsername',
+    'UserCredEmail',
+    'UserCredUsername',
+    'UserHistory',
+    'UserHistoryDTO',
+    'BrokerUserEmail',
+    'JWTToken',
+    'JWTRefreshToken',
+    'JWTTypeToken',
+    'JWTPayload'
 ]

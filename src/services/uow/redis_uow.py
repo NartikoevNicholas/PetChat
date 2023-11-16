@@ -1,8 +1,9 @@
+import typing as tp
+
 from redis.asyncio import Redis
 
 from src.infrastructure.memory_storage import RedisMemoryStorage
-
-from .abstract_uow import AbstractMemoryStorageUOW
+from src.services.uow.abstract_uow import AbstractMemoryStorageUOW
 
 
 class RedisUOW(AbstractMemoryStorageUOW):
@@ -11,11 +12,12 @@ class RedisUOW(AbstractMemoryStorageUOW):
         self.redis = redis
         self.pipeline = redis.pipeline(transaction=True)
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> tp.Self:
         self.storage = RedisMemoryStorage(
             redis=self.redis,
             pipeline=self.pipeline
         )
+        return self
 
     async def commit(self) -> None:
         await self.pipeline.execute()

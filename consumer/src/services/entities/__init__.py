@@ -1,8 +1,12 @@
-from .email_entity import EmailMessageEntity
-from .broker_entity import BrokerUserEmailEntity
+from .email_entity import EmailMessage
+from .broker_entity import (
+    BrokerUserEmail,
+    BrokerFunctions
+)
 
 
 __all__ = [
-    'EmailMessageEntity',
-    'BrokerUserEmailEntity',
+    'EmailMessage',
+    'BrokerUserEmail',
+    'BrokerFunctions'
 ]

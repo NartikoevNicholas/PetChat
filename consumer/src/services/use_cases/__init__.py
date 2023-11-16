@@ -1,8 +1,6 @@
-from src.services.use_cases.broker_use_case import BrokerUseCase
-from src.services.use_cases.user_use_case import UserUseCase
+from src.services.use_cases.consumer_use_case import ConsumerService
 
 
 __all__ = [
-    'UserUseCase',
-    'BrokerUseCase'
+    'ConsumerService'
 ]

@@ -1,14 +1,16 @@
 from fastapi import APIRouter
 
+from . import api
+
 
 router = APIRouter(
-    prefix='/v1/health'
+    prefix=f'/{api.ROUTER_HEALTH}',
+    tags=['health']
 )
 
 
 @router.get(
-    path='/pong'
+    path=api.HEALTH_PING
 )
 async def ping():
-    print('1')
     return {'msg': 'pong'}

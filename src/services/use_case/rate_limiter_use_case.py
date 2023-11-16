@@ -1,26 +1,40 @@
 from fastapi import Request
 
-from src.endpoints.exceptions import ManyRequestsHTTPException
+from src.core.config import DefaultSettings
+from src.endpoints import exceptions as exc
 from src.services.uow.abstract_uow import AbstractMemoryStorageUOW
 
 
 class RateLimiterService:
     def __init__(
         self,
-        config,
+        config: DefaultSettings,
         memory_uow: AbstractMemoryStorageUOW,
     ):
+        self.period = 1
         self.config = config
         self.memory_uow = memory_uow
 
-    async def __call__(self, request: Request, *args, **kwargs):
-        if not self.config['DEBUG']:
-            async with self.memory_uow:
-                ip = request.client.host
-                separation = 1 / self.config['REQUEST_PER_SECOND']
-                redis_time = await self.memory_uow.storage.get_time()
+    async def __call__(self, request: Request, *args, **kwargs) -> None:
 
-                last_request = await self.memory_uow.storage.get(ip)
+        """
+        method checks makes sure that the user has not exceeded the allowed
+        number of requests per second. If the user has exceeded allowed number request, then
+        an error occurs '429 too many request'.
+        Example: if count request equal 10 and period 60 sec, then rps equal
+        1 request pre 6 second.
+        Period is const and equal to 1
+        """
+
+        if self.config.DEBUG:
+            async with self.memory_uow as mem:
+                result = False
+                ip = request.client.host
+                separation = self.period / self.config.REQUEST_PER_SECOND
+                redis_time = await mem.storage.get_time()
+
+                lock = await mem.storage.lock(ip)
+                last_request = await mem.storage.get(ip)
                 if last_request is None:
                     last_request = redis_time
                 else:
@@ -28,6 +42,9 @@ class RateLimiterService:
 
                 if last_request - redis_time <= separation:
                     new_last_request = max(last_request, redis_time) + separation
-                    await self.memory_uow.storage.set(ip, new_last_request)
-                else:
-                    raise ManyRequestsHTTPException
+                    await mem.storage.set(ip, new_last_request)
+                    result = True
+
+                await mem.storage.unlock(lock)
+                if result:
+                    raise exc.ManyRequestsHTTPException

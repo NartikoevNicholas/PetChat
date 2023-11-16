@@ -3,17 +3,18 @@ from dependency_injector import (
     providers
 )
 
-from src.core import get_default_settings
+from src.core.settings import get_default_settings
+from src.infrastructure.broker import RabbitmqBroker
 from src.infrastructure.email import GmailEmail
-from src.services.abstract_interface import AbstractEmail
-from src.services.use_cases.user_use_case import UserUseCase
-from src.services.use_cases.broker_use_case import BrokerUseCase
-
-
-settings = get_default_settings()
+from src.services.abstract_interface import (
+    AbstractEmail,
+    AbstractBroker
+)
+from src.services.use_cases.consumer_use_case import ConsumerService
 
 
 class Container(containers.DeclarativeContainer):
+    config = get_default_settings()
     wiring_config = containers.WiringConfiguration(
         packages=["src.services.use_cases"]
     )
@@ -21,19 +22,19 @@ class Container(containers.DeclarativeContainer):
     # infrastructure
     email: AbstractEmail = providers.Factory(
         GmailEmail,
-        username=settings.EMAIL_USERNAME,
-        password=settings.EMAIL_PASSWORD
+        username=config.EMAIL_USERNAME,
+        password=config.EMAIL_PASSWORD
+    )
+    broker: AbstractBroker = providers.Factory(
+        RabbitmqBroker,
+        url=config.RABBITMQ.rabbitmq_url
+
     )
 
     # use_case
-    user: UserUseCase = providers.Factory(
-        UserUseCase,
-        email=email
-    )
-
-    # consumer
-    broker: BrokerUseCase = providers.Factory(
-        BrokerUseCase,
-        credentials=settings.RABBITMQ.rabbitmq_url,
-        user=user
+    consumer: ConsumerService = providers.Factory(
+        ConsumerService,
+        config=config,
+        email=email,
+        broker=broker,
     )

@@ -1,10 +1,12 @@
 from .dependencies import (
     user_depends,
-    rate_limiter_depends
+    rate_limiter_depends,
+    auth_depends
 )
 
 
 __all__ = [
     'user_depends',
-    'rate_limiter_depends'
+    'rate_limiter_depends',
+    'auth_depends'
 ]

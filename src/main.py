@@ -5,13 +5,13 @@ from src.core.config import get_config
 
 
 app = get_application()
-config = get_config()
+settings = get_config()
 
 
 if __name__ == '__main__':
     uvicorn.run(
         'src.main:app',
-        host=config.UVICORN_HOST,
-        port=config.UVICORN_PORT,
+        host=settings.UVICORN_HOST,
+        port=settings.UVICORN_PORT,
         reload=True
     )

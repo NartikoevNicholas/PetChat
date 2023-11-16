@@ -1,28 +1,32 @@
-from abc import (
-    ABC,
-    abstractmethod
-)
-
-from typing import Union
+import abc
+import typing as tp
 
 
-SetType = Union[str, bytes, bytearray]
+SetType = tp.Union[int, float, str, bytes, bytearray]
 
 
-class AbstractMemoryStorage(ABC):
+class AbstractMemoryStorage(abc.ABC):
 
-    @abstractmethod
+    @abc.abstractmethod
     async def get_time(self) -> float:
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     async def set(self, name: str, value: SetType, ex: int = None) -> None:
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     async def get(self, key: str) -> bytes:
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     async def delete_one(self, key: str) -> None:
+        pass
+
+    @abc.abstractmethod
+    async def lock(self, name: str, timeout: int = 5) -> tp.Any:
+        pass
+
+    @abc.abstractmethod
+    async def unlock(self, lock: tp.Any) -> None:
         pass

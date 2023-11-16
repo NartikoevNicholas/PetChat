@@ -1,13 +1,11 @@
-from abc import (
-    ABC,
-    abstractmethod
-)
-from src.services.entities import BrokerUserEmailEntity
+import abc
+
+from src.services.entities import BrokerUserEmail
 
 
-class AbstractBroker(ABC):
+class AbstractBroker(abc.ABC):
     send_registration_queue_name: str = 'send_registration_email'
 
-    @abstractmethod
-    async def send_registration_queue(self, schema: BrokerUserEmailEntity) -> None:
+    @abc.abstractmethod
+    async def send_registration_queue(self, schema: BrokerUserEmail) -> None:
         pass

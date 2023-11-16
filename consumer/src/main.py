@@ -1,12 +1,12 @@
 import asyncio
 
-from src.core.containers import Container
+from src.core.container import Container
 
 
 async def main():
     container = Container()
 
-    broker = container.broker()
+    broker = container.consumer()
     await broker.listening()
 
 

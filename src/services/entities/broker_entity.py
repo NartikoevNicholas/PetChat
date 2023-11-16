@@ -4,7 +4,7 @@ from pydantic import (
 )
 
 
-class BrokerUserEmailEntity(BaseModel):
+class BrokerUserEmail(BaseModel):
     username: str
     email: EmailStr
     link: str

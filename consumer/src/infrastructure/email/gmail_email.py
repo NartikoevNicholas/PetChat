@@ -1,8 +1,7 @@
 import aiosmtplib
-
 from email.message import EmailMessage
 
-from src.services.entities import EmailMessageEntity
+from src.services import entities as et
 from src.services.abstract_interface import AbstractEmail
 
 
@@ -14,7 +13,7 @@ class GmailEmail(AbstractEmail):
         self._username: str = username
         self._password: str = password
 
-    async def send(self, schema: EmailMessageEntity) -> None:
+    async def send(self, schema: et.EmailMessage) -> None:
         mes = EmailMessage()
         mes['To'] = ''.join(schema.to)
         mes['From'] = self._username

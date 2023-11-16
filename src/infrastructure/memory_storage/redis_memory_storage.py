@@ -1,4 +1,5 @@
 from redis.asyncio import Redis
+from redis.asyncio.lock import Lock
 from redis.asyncio.client import Pipeline
 
 from src.services.abstract_interfase import (
@@ -11,9 +12,6 @@ class RedisMemoryStorage(AbstractMemoryStorage):
     def __init__(self, redis: Redis, pipeline: Pipeline):
         self.redis = redis
         self.pipeline = pipeline
-
-    def lock(self, name: str, timeout: int = 5):
-        self.redis.lock(f'Lock:{name}', timeout)
 
     async def get_time(self) -> float:
         t = await self.redis.time()
@@ -30,3 +28,11 @@ class RedisMemoryStorage(AbstractMemoryStorage):
 
     async def delete_one(self, key: str) -> None:
         await self.pipeline.delete(key)
+
+    async def lock(self, name: str, timeout: int = 5) -> Lock:
+        lock = self.redis.lock(f'Lock:{name}', timeout)
+        await lock.acquire()
+        return lock
+
+    async def unlock(self, lock: Lock) -> None:
+        await lock.release()

@@ -6,27 +6,27 @@ from fastapi import (
 )
 from fastapi import status
 from fastapi.responses import JSONResponse
-
-from pydantic import EmailStr
-
 from dependency_injector.wiring import inject
 
 from src.endpoints.dependencies import user_depends
-from src.services.entities import UserCreateEntity
+from src.services import entities as et
+
+from . import api
 
 
 router = APIRouter(
-    prefix='/v1/user'
+    prefix=f'/{api.ROUTER_USER}',
+    tags=['user']
 )
 
 
 @router.post(
-    path='/registrasion'
+    path=f'/{api.USER_REGISTRATION}'
 )
 @inject
 async def user_registration(
     request: Request,
-    data: UserCreateEntity,
+    data: et.UserDTO,
     user_service=user_depends,
 ):
     await user_service.registration(request, data)
@@ -37,7 +37,7 @@ async def user_registration(
 
 
 @router.get(
-    path='/registrasion/verify/{user_id}/{user_code}'
+    path=f'/{api.USER_REGISTRATION_VERIFY}/{{user_id}}/{{user_code}}'
 )
 @inject
 async def user_verification(
@@ -56,15 +56,15 @@ async def user_verification(
     )
 
 
-@router.get(
-    path='/available/username={username}'
+@router.post(
+    path=f'/{api.USER_AVAILABLE_USERNAME}'
 )
 @inject
 async def available_username(
-    username: str,
+    data: et.UserUsername,
     user_service=user_depends,
 ):
-    if await user_service.available_username(username):
+    if await user_service.available_username(data):
         return JSONResponse(
             content={'msg': 'username available'},
             status_code=status.HTTP_200_OK
@@ -75,15 +75,15 @@ async def available_username(
     )
 
 
-@router.get(
-    path='/available/email={email}'
+@router.post(
+    path=f'/{api.USER_AVAILABLE_EMAIL}'
 )
 @inject
 async def available_email(
-    email: EmailStr,
+    data: et.UserEmail,
     user_service=user_depends
 ):
-    if await user_service.available_email(email):
+    if await user_service.available_email(data):
         return JSONResponse(
             content={'msg': 'username available'},
             status_code=status.HTTP_200_OK

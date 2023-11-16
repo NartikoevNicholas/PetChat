@@ -5,7 +5,7 @@ from aio_pika import (
     RobustChannel
 )
 
-from src.services.entities import BrokerUserEmailEntity
+from src.services.entities import BrokerUserEmail
 from src.services.abstract_interfase import AbstractBroker
 
 
@@ -13,7 +13,7 @@ class RabbitmqBroker(AbstractBroker):
     def __init__(self, channel: RobustChannel):
         self.channel = channel
 
-    async def send_registration_queue(self, schema: BrokerUserEmailEntity) -> None:
+    async def send_registration_queue(self, schema: BrokerUserEmail) -> None:
         message = json.dumps(schema.model_dump())
         queue = await self.channel.declare_queue(
             name=self.send_registration_queue_name,

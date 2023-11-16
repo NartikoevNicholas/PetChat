@@ -1,70 +1,53 @@
-from abc import (
-    ABC,
-    abstractmethod
-)
-
-from typing import (
-    Any,
-    List,
-    Optional
-)
+import abc
+import typing as tp
 
 from pydantic import BaseModel
 
-from src.services.entities import (
-    UserEntity,
-    UserCreateEntity,
-    UserHistoryEntity,
-    UserHistoryCreateEntity
-)
+from src.services import entities as et
 
 
-class AbstractRepository(ABC):
+class AbstractRepository(abc.ABC):
     pydantic_model: BaseModel
     pydantic_create_model: BaseModel
 
-    @abstractmethod
+    @abc.abstractmethod
     async def add(self, schema: 'pydantic_create_model') -> 'pydantic_model':
         pass
 
-    @abstractmethod
-    async def add_many(self, schema: List['pydantic_create_model']) -> List['pydantic_model']:
+    @abc.abstractmethod
+    async def add_many(self, schema: tp.List['pydantic_create_model']) -> tp.List['pydantic_model']:
         pass
 
-    async def remove_by_pk(self, pk: Any) -> 'pydantic_model':
+    async def remove_by_pk(self, pk: tp.Any) -> 'pydantic_model':
         pass
 
-    @abstractmethod
-    async def update_by_pk(self, pk: Any, schema: 'pydantic_model') -> 'pydantic_model':
+    @abc.abstractmethod
+    async def update_by_pk(self, pk: tp.Any, schema: 'pydantic_model') -> 'pydantic_model':
         pass
 
-    @abstractmethod
-    async def find_by_pk(self, pk: Any) -> Optional['pydantic_model']:
+    @abc.abstractmethod
+    async def find_one(self, data: tp.Dict[str, tp.Any]) -> tp.Optional['pydantic_model']:
         pass
 
-    @abstractmethod
-    async def find_all(self) -> List['pydantic_model']:
+    @abc.abstractmethod
+    async def find_by_pk(self, pk: tp.Any) -> tp.Optional['pydantic_model']:
         pass
 
-
-class AbstractUserRepository(AbstractRepository, ABC):
-    pydantic_model = UserEntity
-    pydantic_create_model = UserCreateEntity
-
-    @abstractmethod
-    async def find_by_username(self, username: str) -> Optional[pydantic_model]:
-        pass
-
-    @abstractmethod
-    async def find_by_email(self, email: str) -> Optional[pydantic_model]:
+    @abc.abstractmethod
+    async def find_all(self) -> tp.List['pydantic_model']:
         pass
 
 
-class AbstractUserHistoryRepository(AbstractRepository, ABC):
-    pydantic_model = UserHistoryEntity
-    pydantic_create_model = UserHistoryCreateEntity
+class AbstractUserRepository(AbstractRepository, abc.ABC):
+    pydantic_model = et.User
+    pydantic_create_model = et.UserDTO
 
-    async def patch(self, user: UserEntity, patch: dict) -> List[pydantic_model]:
+
+class AbstractUserHistoryRepository(AbstractRepository, abc.ABC):
+    pydantic_model = et.UserHistory
+    pydantic_create_model = et.UserHistoryDTO
+
+    async def patch(self, user: et.User, patch: dict) -> tp.List[pydantic_model]:
         result = []
         old_data = user.model_dump()
         for field, value in patch.items():
