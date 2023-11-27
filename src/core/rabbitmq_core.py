@@ -1,11 +1,11 @@
 from aio_pika import connect_robust
 
-from .config import get_config
+
+def get_rabbitmq_url(rabbitmq_settings: dict):
+    return 'amqp://{RABBITMQ_DEFAULT_USER}:{RABBITMQ_DEFAULT_PASS}@' \
+           '{RABBITMQ_HOST}:{RABBITMQ_PORT}/'.format(**rabbitmq_settings)
 
 
-settings = get_config()
-
-
-async def get_rabbitmq_channel():
-    connect = await connect_robust(settings.RABBITMQ.get_url)
+async def get_rabbitmq_channel(rabbitmq_settings: dict):
+    connect = await connect_robust(get_rabbitmq_url(rabbitmq_settings))
     return await connect.channel(publisher_confirms=False)

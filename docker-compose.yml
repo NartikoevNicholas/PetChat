@@ -9,8 +9,13 @@ services:
       - '.env'
     ports:
       - '5432:${POSTGRES_PORT}'
+    volumes:
+      - './db/init.sql:/docker-entrypoint-initdb.d/create_tables.sql'
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "postgres" ]
+    networks:
+      net:
+        ipv4_address: '${POSTGRES_HOST}'
 
   redis:
     image: redis
@@ -22,6 +27,9 @@ services:
       - '6379:${REDIS_PORT}'
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+    networks:
+      net:
+        ipv4_address: '${REDIS_HOST}'
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -34,6 +42,9 @@ services:
       - '15672:15672'
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+    networks:
+      net:
+        ipv4_address: '${RABBITMQ_HOST}'
 
   consumer:
     build: 'consumer/'
@@ -42,3 +53,12 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+    networks:
+      net:
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24

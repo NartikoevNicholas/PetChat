@@ -1,23 +1,27 @@
+from typing import Tuple
+
 from fastapi import Depends
-from dependency_injector.wiring import inject
+from fastapi.security import OAuth2PasswordBearer
+from dependency_injector.wiring import (
+    inject,
+    Provide
+)
 
-from src.core.config import get_config
-from src.endpoints.dependencies import auth_depends
-from src.endpoints.exceptions import BadRequestJWTHTTPException
-from src.services import entities as et
+from src.core.containers import Container
+from src.services.entities import JWTPayload
+from src.services.use_case import AuthService
 
 
-settings = get_config()
+oauth2_schema = OAuth2PasswordBearer(tokenUrl='')
 
 
 class AuthMiddleware:
-    @staticmethod
     @inject
-    async def verify_access_token(
-        token: str = Depends(settings.oauth2_schema()),
-        auth_service=auth_depends
-    ) -> et.JWTPayload:
-        jwt_payload = await auth_service.verify_token(token)
-        if jwt_payload.token_type != et.JWTTypeToken.access:
-            raise BadRequestJWTHTTPException
-        return jwt_payload
+    async def __call__(self,
+                       auth_service: AuthService = Depends(Provide[Container.auth_service]),
+                       token: str = Depends(oauth2_schema)) -> Tuple[str, JWTPayload]:
+        """
+        The AuthMiddleware check token
+        """
+        payload = await auth_service.verify_token(token)
+        return token, payload

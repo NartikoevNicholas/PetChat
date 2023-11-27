@@ -5,6 +5,16 @@ import typing as tp
 SetType = tp.Union[int, float, str, bytes, bytearray]
 
 
+class AbstractReadlockMemoryStorage(abc.ABC):
+    @abc.abstractmethod
+    async def __aenter__(self):
+        pass
+
+    @abc.abstractmethod
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+
 class AbstractMemoryStorage(abc.ABC):
 
     @abc.abstractmethod
@@ -24,9 +34,6 @@ class AbstractMemoryStorage(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def lock(self, name: str, timeout: int = 5) -> tp.Any:
+    def readlock(self, name: str, timeout: int = 5) -> AbstractReadlockMemoryStorage:
         pass
 
-    @abc.abstractmethod
-    async def unlock(self, lock: tp.Any) -> None:
-        pass

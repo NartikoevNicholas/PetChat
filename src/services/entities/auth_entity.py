@@ -1,4 +1,4 @@
-import datetime as dt
+from datetime import datetime
 from uuid import UUID
 from enum import Enum
 
@@ -19,17 +19,19 @@ class JWTRefreshToken(BaseModel):
 
 
 class JWTTypeToken(str, Enum):
-    access = 'access'
-    refresh = 'refresh'
+    access = 'access_token'
+    refresh = 'refresh_token'
 
 
 class JWTPayload(BaseModel):
     model_config = ConfigDict(use_enum_values=True)
 
     user_id: UUID
-    token_type: JWTTypeToken
-    exp: dt.datetime
+    type: JWTTypeToken
+    exp: datetime
+    iat: float
 
-    @field_validator('user_id')
-    def check_user_id(cls, val):
-        return val.hex
+    def model_payload(self) -> dict:
+        data = self.model_dump()
+        data['user_id'] = data['user_id'].hex
+        return data

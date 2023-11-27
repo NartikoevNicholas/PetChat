@@ -4,8 +4,10 @@ from src import get_application
 from src.core.config import get_config
 
 
-app = get_application()
 settings = get_config()
+app = get_application(
+    settings=settings
+)
 
 
 if __name__ == '__main__':

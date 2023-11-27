@@ -1,11 +1,23 @@
 from redis.asyncio import Redis
-from redis.asyncio.lock import Lock
 from redis.asyncio.client import Pipeline
 
 from src.services.abstract_interfase import (
     SetType,
-    AbstractMemoryStorage
+    AbstractMemoryStorage,
+    AbstractReadlockMemoryStorage
 )
+
+
+class ReadlockMemoryStorage(AbstractReadlockMemoryStorage):
+    def __init__(self, redis: Redis, name: str, timeout: int):
+        self.lock = redis.lock(name, timeout)
+
+    async def __aenter__(self):
+        await self.lock.acquire()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.lock.release()
 
 
 class RedisMemoryStorage(AbstractMemoryStorage):
@@ -29,10 +41,5 @@ class RedisMemoryStorage(AbstractMemoryStorage):
     async def delete_one(self, key: str) -> None:
         await self.pipeline.delete(key)
 
-    async def lock(self, name: str, timeout: int = 5) -> Lock:
-        lock = self.redis.lock(f'Lock:{name}', timeout)
-        await lock.acquire()
-        return lock
-
-    async def unlock(self, lock: Lock) -> None:
-        await lock.release()
+    def readlock(self, name: str, timeout: int = 2) -> ReadlockMemoryStorage:
+        return ReadlockMemoryStorage(self.redis, name, timeout)

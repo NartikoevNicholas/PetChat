@@ -26,12 +26,13 @@ class AbstractHTTPException(HTTPException, abc.ABC):
 
     def get_detail(self) -> tp.Union[str, dict]:
         content = {
-            'detail': [
-                {
-                    'loc': ['string', 0],
-                    'msg': self.detail_message,
-                    'type': 'string'
-                }
-            ]
+            'loc': ['string', 0],
+            'msg': self.detail_message,
+            'type': 'string'
         }
         return content
+
+    # def get_detail_for_test(self):
+    #     content = {
+    #         'detail': []
+    #     return content

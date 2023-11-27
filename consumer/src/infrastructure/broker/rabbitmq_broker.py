@@ -33,9 +33,15 @@ class RabbitmqBroker(AbstractBroker):
             durable=True
         )
 
+        send_update_email_queue = await channel.declare_queue(
+            self.send_update_email_name,
+            durable=True
+        )
+
         # create list
         self.queues = [
-            (send_registration_email_queue, self._callback(functions.send_registration_email_func))
+            (send_registration_email_queue, self._callback(functions.send_registration_email_func)),
+            (send_update_email_queue, self._callback(functions.send_update_email_func))
         ]
 
     async def start_consume(self):

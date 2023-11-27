@@ -18,7 +18,7 @@ class AbstractRepository(abc.ABC):
     async def add_many(self, schema: tp.List['pydantic_create_model']) -> tp.List['pydantic_model']:
         pass
 
-    async def remove_by_pk(self, pk: tp.Any) -> 'pydantic_model':
+    async def remove_one(self, data: tp.Dict[str, tp.Any]) -> tp.Optional['pydantic_model']:
         pass
 
     @abc.abstractmethod
@@ -39,15 +39,15 @@ class AbstractRepository(abc.ABC):
 
 
 class AbstractUserRepository(AbstractRepository, abc.ABC):
-    pydantic_model = et.User
-    pydantic_create_model = et.UserDTO
+    pydantic_model = et.UserDTO
+    pydantic_create_model = et.UserRequestDTO
 
 
 class AbstractUserHistoryRepository(AbstractRepository, abc.ABC):
     pydantic_model = et.UserHistory
     pydantic_create_model = et.UserHistoryDTO
 
-    async def patch(self, user: et.User, patch: dict) -> tp.List[pydantic_model]:
+    async def patch(self, user: et.UserDTO, patch: dict) -> tp.List[pydantic_model]:
         result = []
         old_data = user.model_dump()
         for field, value in patch.items():

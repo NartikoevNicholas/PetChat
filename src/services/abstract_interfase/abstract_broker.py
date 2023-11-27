@@ -1,11 +1,16 @@
 import abc
 
-from src.services.entities import BrokerUserEmail
+from src.services import entities as et
 
 
 class AbstractBroker(abc.ABC):
-    send_registration_queue_name: str = 'send_registration_email'
+    user_reg_queue_name: str = 'user_reg'
+    user_email_upd_queue_name: str = 'user_email_upd'
 
     @abc.abstractmethod
-    async def send_registration_queue(self, schema: BrokerUserEmail) -> None:
+    async def email_reg(self, schema: et.BrokerUserReg) -> None:
+        pass
+
+    @abc.abstractmethod
+    async def email_upd(self, schema: et.BrokerUserEmailUpdate) -> None:
         pass

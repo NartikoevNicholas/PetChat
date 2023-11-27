@@ -1,13 +1,31 @@
 import abc
-import typing as tp
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional
+)
 
-from pydantic import BaseModel
-import sqlalchemy as sa
+from sqlalchemy import (
+    select,
+    insert,
+    update,
+    delete,
+    and_
+)
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.exc import (
+    NoResultFound,
+    IntegrityError,
+    MultipleResultsFound,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError
+from pydantic import BaseModel
 
-from src.endpoints import exceptions as exc
+from src.endpoints.exceptions import (
+    DuplicateUserEmailHTTPException,
+    DuplicateUserUsernameHTTPException
+)
 from src.services.abstract_interfase import AbstractRepository
 
 
@@ -19,42 +37,81 @@ class SQLAlchemyAdapter(AbstractRepository, abc.ABC):
     def __init__(self, async_session: AsyncSession):
         self.async_session: AsyncSession = async_session
 
-    async def add(self, schema: 'pydantic_create_model') -> 'pydantic_model':
+    async def add(self,
+                  schema: 'pydantic_create_model') -> 'pydantic_model':
+        """
+
+        :param schema:
+        :return:
+        """
         try:
             response = await self.async_session.execute(
-                sa.insert(self.model)
+                insert(self.model)
                 .values(schema.model_dump(exclude_none=True))
                 .returning(self.model)
             )
             obj = response.scalar_one()
             return self.pydantic_model.model_validate(obj)
         except IntegrityError as e:
-            if e.args[0].contains('email'):
-                raise exc.DuplicateUserEmailHTTPException
+            if e.args[0].__contains__('email'):
+                raise DuplicateUserEmailHTTPException
             else:
-                raise exc.DuplicateUserUsernameHTTPException
+                raise DuplicateUserUsernameHTTPException
 
-    async def add_many(self, schemas: tp.List['pydantic_create_model']) -> tp.List['pydantic_model']:
+    async def add_many(self,
+                       schemas: List['pydantic_create_model']) -> List['pydantic_model']:
+        """
+
+        :param schemas:
+        :return:
+        """
         response = await self.async_session.execute(
-            sa.insert(self.model)
+            insert(self.model)
             .returning(self.model),
             [schema.model_dump(exclude_none=True) for schema in schemas]
         )
         return [self.pydantic_model.model_validate(obj) for obj in response.scalars()]
 
-    async def remove_by_pk(self, pk: tp.Any) -> 'pydantic_model':
-        response = await self.async_session.execute(
-            sa.delete(self.model)
-            .where(self.model.id.__eq__(pk))
-            .returning(self.model)
-        )
-        obj = response.scalar_one()
-        return self.pydantic_model.model_validate(obj)
+    async def remove_one(self,
+                         data: Dict[str, Any]) -> Optional['pydantic_model']:
+        """
 
-    async def update_by_pk(self, pk: tp.Any, schema: 'pydantic_model') -> 'pydantic_model':
+        :param data:
+        :return:
+        """
+        params = []
+        for name in self.model.__table__.c:
+            value = data.get(name.key)
+            if value is not None:
+                params.append(name.__eq__(value))
         try:
             response = await self.async_session.execute(
-                sa.update(self.model)
+                delete(self.model)
+                .where(and_(*params))
+                .returning(self.model)
+            )
+            obj = response.scalar_one()
+
+            return self.pydantic_model.model_validate(obj)
+
+        except NoResultFound:
+            return None
+
+        except MultipleResultsFound:
+            raise
+
+    async def update_by_pk(self,
+                           pk: Any,
+                           schema: 'pydantic_model') -> 'pydantic_model':
+        """
+
+        :param pk:
+        :param schema:
+        :return:
+        """
+        try:
+            response = await self.async_session.execute(
+                update(self.model)
                 .where(self.model.id.__eq__(pk))
                 .values(schema.model_dump(exclude_none=True))
                 .returning(self.model)
@@ -62,36 +119,58 @@ class SQLAlchemyAdapter(AbstractRepository, abc.ABC):
             obj = response.scalar_one()
             return self.pydantic_model.model_validate(obj)
         except IntegrityError as e:
-            if e.args[0].contains('email'):
-                raise exc.DuplicateUserEmailHTTPException
+            if e.args[0].__contains__('email'):
+                raise DuplicateUserEmailHTTPException
             else:
-                raise exc.DuplicateUserUsernameHTTPException
+                raise DuplicateUserUsernameHTTPException
 
-    async def find_one(self, data: tp.Dict[str, tp.Any]) -> tp.Optional['pydantic_model']:
+    async def find_one(self,
+                       data: Dict[str, Any]) -> Optional['pydantic_model']:
+        """
+
+        :param data:
+        :return:
+        """
         params = []
         for name in self.model.__table__.c:
             value = data.get(name.key)
             if value is not None:
                 params.append(name.__eq__(value))
+        try:
+            response = await self.async_session.execute(
+                select(self.model)
+                .where(and_(*params))
+            )
+            obj = response.scalar_one()
+            return self.pydantic_model.model_validate(obj) if obj else obj
 
-        response = await self.async_session.execute(
-            sa.select(self.model)
-            .where(sa.and_(*params))
-        )
-        obj = response.scalar()
-        return self.pydantic_model.model_validate(obj) if obj else obj
+        except NoResultFound:
+            return None
 
-    async def find_by_pk(self, pk: tp.Any) -> tp.Optional['pydantic_model']:
+        except MultipleResultsFound:
+            raise
+
+    async def find_by_pk(self,
+                         pk: Any) -> Optional['pydantic_model']:
+        """
+
+        :param pk:
+        :return:
+        """
         response = await self.async_session.execute(
-            sa.select(self.model)
+            select(self.model)
             .where(self.model.id.__eq__(pk))
             .with_for_update()
         )
         obj = response.scalar_one()
         return self.pydantic_model.model_validate(obj)
 
-    async def find_all(self) -> tp.List['pydantic_model']:
+    async def find_all(self) -> List['pydantic_model']:
+        """
+
+        :return:
+        """
         response = await self.async_session.execute(
-            sa.select(self.model)
+            select(self.model)
         )
         return [self.pydantic_model.model_validate(obj) for obj in response.scalars()]

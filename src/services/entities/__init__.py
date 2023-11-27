@@ -1,17 +1,23 @@
+from typing import Union
+
 from .user_entity import (
-    User,
     UserDTO,
-    UserEmail,
-    UserUsername,
-    UserCredEmail,
-    UserCredUsername,
+    UserEmailDTO,
+    UserRequestDTO,
+    UserResponseDTO,
+    UserUsernameDTO,
+    UserPasswordDTO,
+    UserUpdatePassword,
+    UserEmailPasswordDTO,
+    UserUsernamePasswordDTO,
 )
 from .user_history_entity import (
     UserHistory,
     UserHistoryDTO
 )
 from .broker_entity import (
-    BrokerUserEmail
+    BrokerUserReg,
+    BrokerUserEmailUpdate
 )
 from .auth_entity import (
     JWTToken,
@@ -21,18 +27,30 @@ from .auth_entity import (
 )
 
 
+# Types
+LoginType = Union[UserUsernamePasswordDTO, UserEmailPasswordDTO]
+UserUpdateType = Union[UserEmailPasswordDTO, UserUsernamePasswordDTO, UserUpdatePassword]
+
+
 __all__ = [
-    'User',
     'UserDTO',
-    'UserEmail',
-    'UserUsername',
-    'UserCredEmail',
-    'UserCredUsername',
+    'UserEmailDTO',
+    'UserUsernameDTO',
     'UserHistory',
     'UserHistoryDTO',
-    'BrokerUserEmail',
+    'UserRequestDTO',
+    'UserResponseDTO',
+    'UserPasswordDTO',
+    'UserUpdatePassword',
+    'UserEmailPasswordDTO',
+    'UserUsernamePasswordDTO',
+    'BrokerUserReg',
+    'BrokerUserEmailUpdate',
     'JWTToken',
     'JWTRefreshToken',
     'JWTTypeToken',
-    'JWTPayload'
+    'JWTPayload',
+
+    'LoginType',
+    'UserUpdateType'
 ]

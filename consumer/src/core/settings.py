@@ -52,6 +52,10 @@ class DefaultSettings(Settings):
     EMAIL_USERNAME: str
     EMAIL_PASSWORD: str
 
+    # html names
+    REG_USER_HTML: str = 'registration.html'
+    UPD_USER_EMAIL_HTML: str = 'update_email.html'
+
 
 @lru_cache()
 def get_default_settings() -> DefaultSettings:

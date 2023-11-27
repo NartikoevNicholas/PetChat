@@ -10,13 +10,15 @@ from src.infrastructure.repository.postgres_models import (
     User,
     UserHistory
 )
+from src.core.sqlalchemy_core import get_sync_postgres_url
 from src.core.config import get_config
 
 
 config = context.config
 settings = get_config()
 
-config.set_main_option('sqlalchemy.url', settings.POSTGRES.sync_url)
+sqlalchemy_url = get_sync_postgres_url(settings.POSTGRES.model_dump())
+config.set_main_option('sqlalchemy.url', sqlalchemy_url)
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 

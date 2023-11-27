@@ -3,12 +3,15 @@ from src.services.abstract_interfase import (
     AbstractUserHistoryRepository
 )
 from src.infrastructure.repository.adapters import SQLAlchemyAdapter
-from src.infrastructure.repository import postgres_models as md
+from src.infrastructure.repository.postgres_models import (
+    User,
+    UserHistory
+)
 
 
 class UserRepository(AbstractUserRepository, SQLAlchemyAdapter):
-    model = md.User
+    model = User
 
 
 class UserHistoryRepository(AbstractUserHistoryRepository, SQLAlchemyAdapter):
-    model = md.UserHistory
+    model = UserHistory

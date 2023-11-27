@@ -1,7 +1,16 @@
 from .bad_request_exception import (
-    BadRequestJWTExpiredHTTPException,
-    BadRequestJWTHTTPException,
-    BadRequestLogoutHTTPException
+    BadRequestHTTPException,
+    TokenTypeInvalidHTTPException,
+    TokenExpiredHTTPException,
+    TokenInvalidHTTPException,
+    TokenDeletedHTTPException,
+    TokenLogoutHTTPException,
+    InvalidPasswordHTTPException,
+    UserNotFoundHTTPException,
+    NeedEmailVerifyHTTPException,
+    EmailBusyHTTPException,
+    InvalidLinkHTTPException,
+    UsernameBusyHTTPException
 )
 from .many_request_exception import ManyRequestsHTTPException
 from .duplicate_exception import (
@@ -12,11 +21,20 @@ from .unauthorized_exception import UnauthorizedHTTPException
 
 
 __all__ = [
-    'BadRequestJWTExpiredHTTPException',
-    'BadRequestJWTHTTPException',
-    'BadRequestLogoutHTTPException',
+    'BadRequestHTTPException',
+    'TokenTypeInvalidHTTPException',
+    'TokenExpiredHTTPException',
+    'TokenInvalidHTTPException',
+    'TokenDeletedHTTPException',
+    'TokenLogoutHTTPException',
+    'InvalidPasswordHTTPException',
+    'UserNotFoundHTTPException',
+    'NeedEmailVerifyHTTPException',
+    'EmailBusyHTTPException',
+    'UsernameBusyHTTPException',
     'ManyRequestsHTTPException',
     'DuplicateUserEmailHTTPException',
     'DuplicateUserUsernameHTTPException',
-    'UnauthorizedHTTPException'
+    'UnauthorizedHTTPException',
+    'InvalidLinkHTTPException'
 ]

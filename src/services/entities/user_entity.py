@@ -1,55 +1,105 @@
 import datetime
-import typing as tp
 from uuid import UUID
+from typing import Optional
 
 from pydantic import (
     BaseModel,
     EmailStr,
     Field,
     ConfigDict,
-    field_validator
 )
 
-from src.core.config import get_config
+min_len_username = 8
+max_len_username = 100
+
+min_len_pass = 8
+max_len_pass = 100
 
 
-settings = get_config()
+class UserDTO(BaseModel):
+    model_config = ConfigDict(from_attributes=True, loc_by_alias=False)
+
+    id: Optional[UUID] = Field(
+        default=None
+    )
+    username: Optional[str] = Field(
+        default=None,
+        min_length=min_len_username,
+        max_length=max_len_pass
+    )
+    email: Optional[EmailStr] = Field(
+        default=None
+    )
+    hashed_password: Optional[str] = Field(
+        default=None,
+        min_length=min_len_pass,
+        max_length=max_len_pass
+    )
+    is_active: Optional[bool] = Field(
+        default=None
+    )
+    is_deleted: Optional[bool] = Field(
+        default=None
+    )
+    is_superuser: Optional[bool] = Field(
+        default=None
+    )
+    dt_update: Optional[datetime.datetime] = Field(
+        default=None
+    )
+    dt_created: Optional[datetime.datetime] = Field(
+        default=None
+    )
 
 
-class User(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: tp.Optional[UUID] = None
-    username: tp.Optional[str] = None
-    email: tp.Optional[EmailStr] = None
-    hashed_password: tp.Optional[str] = None
-    is_active: tp.Optional[bool] = None
-    is_deleted: tp.Optional[bool] = None
-    is_superuser: tp.Optional[bool] = None
-    dt_update: tp.Optional[datetime.datetime] = None
-    dt_created: tp.Optional[datetime.datetime] = None
+class UserEmailDTO(BaseModel):
+    email: EmailStr
 
 
-class UserEmail(BaseModel):
-    email: EmailStr = Field(min_length=8, max_length=39)
+class UserUsernameDTO(BaseModel):
+    username: str = Field(
+        min_length=min_len_username,
+        max_length=max_len_pass
+    )
 
 
-class UserUsername(BaseModel):
-    username: str = Field(min_length=8, max_length=39)
+class UserPasswordDTO(BaseModel):
+    password: str = Field(
+        min_length=min_len_pass,
+        max_length=max_len_pass
+    )
 
 
-class UserCredEmail(UserEmail):
-    password: str = Field(min_length=8, max_length=39)
+class UserEmailPasswordDTO(UserEmailDTO, UserPasswordDTO):
+    pass
 
 
-class UserCredUsername(UserUsername):
-    password: str = Field(min_length=8, max_length=39)
+class UserUsernamePasswordDTO(UserUsernameDTO, UserPasswordDTO):
+    pass
 
 
-class UserDTO(UserEmail, UserUsername):
-    hashed_password: str = Field(alias='password', min_length=8, max_length=39)
+class UserRequestDTO(UserEmailDTO, UserUsernameDTO):
+    hashed_password: str = Field(
+        alias='password',
+        min_length=min_len_pass,
+        max_length=max_len_pass
+    )
+    is_superuser: Optional[bool] = Field(
+        default=False
+    )
+
+
+class UserResponseDTO(UserEmailDTO, UserUsernameDTO):
+    id: UUID
     is_superuser: bool
 
-    @field_validator('hashed_password')
-    def check_hashed_password(cls, value):
-        return settings.pwd_context().hash(value)
+
+class UserUpdatePassword(BaseModel):
+    new_password: str = Field(
+        min_length=min_len_pass,
+        max_length=max_len_pass
+    )
+    password: str = Field(
+        min_length=min_len_pass,
+        max_length=max_len_pass
+    )

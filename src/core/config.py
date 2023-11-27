@@ -2,10 +2,7 @@ import os
 import typing as tp
 from pathlib import Path
 from functools import lru_cache
-
-from starlette.datastructures import URL
-from fastapi.security import OAuth2PasswordBearer
-from passlib.context import CryptContext
+from dataclasses import dataclass
 
 from pydantic_settings import (
     BaseSettings,
@@ -13,9 +10,28 @@ from pydantic_settings import (
 )
 
 
-class Settings(BaseSettings):
-    BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
+BASE_DIR: Path = Path(__file__).resolve().parent.parent.parent
 
+
+@dataclass
+class API:
+    user_me_v1 = '/v1/user/me'
+    user_update_v1 = '/v1/user/update'
+    user_delete_v1 = '/v1/user/delete'
+    user_email_verify_v1 = '/v1/user/email_verify'
+    user_registration_v1 = '/v1/user/registration'
+    user_available_v1 = '/v1/user/available'
+
+    auth_login_v1 = '/v1/auth/login'
+    auth_logout_v1 = '/v1/auth/logout'
+    auth_refresh_v1 = '/v1/auth/refresh'
+
+    health_ping_db_v1 = '/v1/health_ping/db'
+    health_ping_app_v1 = '/v1/health_ping/app'
+    health_ping_memory_cache_v1 = '/v1/health_ping/memory_cache'
+
+
+class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         extra='ignore',
         env_file=os.path.join(BASE_DIR, '.env'),
@@ -30,36 +46,11 @@ class PostgresSettings(Settings):
     POSTGRES_HOST: str
     POSTGRES_PORT: int
 
-    @property
-    def settings_dict(self) -> dict:
-        return {
-            'user': self.POSTGRES_USER,
-            'pwd': self.POSTGRES_PASSWORD,
-            'db': self.POSTGRES_DB,
-            'host': self.POSTGRES_HOST,
-            'port': self.POSTGRES_PORT
-        }
-
-    @property
-    def async_url(self) -> str:
-        return 'postgresql+asyncpg://{user}:{pwd}@{host}:{port}/{db}'.format(
-            **self.settings_dict
-        )
-
-    @property
-    def sync_url(self) -> str:
-        return 'postgresql://{user}:{pwd}@{host}:{port}/{db}'.format(
-            **self.settings_dict
-        )
-
 
 class RedisSettings(Settings):
     REDIS_HOST: str
     REDIS_PORT: int
-
-    @property
-    def get_url(self) -> str:
-        return f'redis://{self.REDIS_HOST}:{self.REDIS_PORT}'
+    REDIS_DB: int
 
 
 class RabbitmqSettings(Settings):
@@ -69,59 +60,23 @@ class RabbitmqSettings(Settings):
     RABBITMQ_PORT: int
     RABBITMQ_MESSAGE_TTL: int
 
-    @property
-    def settings_dict(self) -> dict:
-        return {
-            'user': self.RABBITMQ_DEFAULT_USER,
-            'pwd': self.RABBITMQ_DEFAULT_PASS,
-            'host': self.RABBITMQ_HOST,
-            'port': self.RABBITMQ_PORT
-        }
-
-    @property
-    def get_url(self) -> str:
-        return 'amqp://{user}:{pwd}@{host}:{port}/'.format(
-            **self.settings_dict
-        )
-
-
-class APISettings(Settings):
-    API_VERSION: str
-
-    ROUTER_HEALTH: str
-    ROUTER_USER: str
-    ROUTER_AUTH: str
-
-    HEALTH_PING: str
-
-    USER_REGISTRATION: str
-    USER_REGISTRATION_VERIFY: str
-    USER_AVAILABLE_USERNAME: str
-    USER_AVAILABLE_EMAIL: str
-
-    AUTH_LOGIN: str
-    AUTH_REFRESH: str
-    AUTH_LOGOUT: str
-
-    def email_verify_api(self, base_url: URL, user_id: str, code: str):
-        api = self.USER_REGISTRATION_VERIFY
-        router = self.ROUTER_USER
-        api_version = self.API_VERSION
-        return f'{base_url}{api_version}/{router}/{api}/{user_id}/{code}'
-
 
 class DefaultSettings(Settings):
     # project
+    BASE_DIR: Path = BASE_DIR
     DEBUG: bool
+    SEP: str
     ALGORITHM: str
     TOKEN_ALGORITHM: str
     SECRET_KEY: str
-    EXPIRE_TIME: int
-    LENGTH_USER_CODE: int
+    REG_EXP_TIME: int
+    DEL_EXP_TIME: int
+    EXPIRE_TIME_EMAIL_VERIFY: int
+    LENGTH_CODE: int
     REDIRECT_AFTER_VERIFY_EMAIL: str
     REQUEST_PER_SECOND: tp.Union[int, float]
-    EXPIRE_ACCESS_TOKEN: int
-    EXPIRE_REFRESH_TOKEN: int
+    ACCESS_EXP_TIME: int
+    REFRESH_EXP_TIME: int
 
     # fastapi
     PROJECT_NAME: str
@@ -136,20 +91,6 @@ class DefaultSettings(Settings):
     REDIS: RedisSettings = RedisSettings()
     POSTGRES: PostgresSettings = PostgresSettings()
     RABBITMQ: RabbitmqSettings = RabbitmqSettings()
-
-    # api
-    API: APISettings = APISettings()
-
-    def pwd_context(self) -> CryptContext:
-        return CryptContext(schemes=[self.ALGORITHM], deprecated="auto")
-
-    def oauth2_schema(self) -> OAuth2PasswordBearer:
-        return OAuth2PasswordBearer(
-            tokenUrl=f'{self.UVICORN_HOST}:'
-                     f'{self.UVICORN_PORT}/'
-                     f'{self.API.ROUTER_AUTH}/'
-                     f'{self.API.AUTH_LOGOUT}'
-        )
 
 
 @lru_cache

@@ -5,7 +5,7 @@ from .v1 import (
 )
 
 
-v1_routers = [
+routers = [
     user_api.router,
     health_api.router,
     auth_api.router
@@ -13,5 +13,5 @@ v1_routers = [
 
 
 __all__ = [
-    'v1_routers'
+    'routers'
 ]
