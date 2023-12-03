@@ -75,7 +75,7 @@ class Container(containers.DeclarativeContainer):
         repository_uow=user_repository_uow,
         broker_uow=rabbitmq_uow
     )
-    rate_limiter_service = providers.Factory(
+    rate_limiter_service = providers.Singleton(
         RateLimiterService,
         config=config,
         memory_uow=redis_uow,

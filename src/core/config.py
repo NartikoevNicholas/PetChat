@@ -78,10 +78,15 @@ class DefaultSettings(Settings):
     ACCESS_EXP_TIME: int
     REFRESH_EXP_TIME: int
 
+    # logging
+    LOG_DIR: str
+    HTTP_LOG_NAME: str
+    BUSINESS_LOGIC_LOG_NAME: str
+
     # fastapi
-    PROJECT_NAME: str
     DOCS_URL: str
     OPENAPI_URL: str
+    PROJECT_NAME: str
 
     # uvicorn
     UVICORN_HOST: str

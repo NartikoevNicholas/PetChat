@@ -11,7 +11,7 @@ from src.services.entities import (
     BrokerUserReg,
     BrokerUserEmailUpdate
 )
-from src.services.abstract_interfase import AbstractBroker
+from src.services.abstract_interface import AbstractBroker
 
 
 class RabbitmqBroker(AbstractBroker):

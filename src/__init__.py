@@ -14,11 +14,12 @@ def bind_routers(app: FastAPI) -> None:
         )
 
 
-def bind_middleware(app: FastAPI) -> None:
+def bind_middlewares(app: FastAPI) -> None:
     for middleware in middlewares:
+        middle = middleware()
         app.add_middleware(
             middleware_class=BaseHTTPMiddleware,
-            dispatch=middleware
+            dispatch=middle
         )
 
 
@@ -31,7 +32,7 @@ def get_application(settings: DefaultSettings = None) -> FastAPI:
     container = Container()
     container.config.from_dict(settings.model_dump())
     bind_routers(app)
-    bind_middleware(app)
+    bind_middlewares(app)
     return app
 
 

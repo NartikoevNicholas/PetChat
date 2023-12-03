@@ -2,7 +2,6 @@ from typing import Callable
 
 from fastapi import Request
 from fastapi.responses import JSONResponse
-
 from dependency_injector.wiring import inject, Provide
 
 from src.core.containers import Container

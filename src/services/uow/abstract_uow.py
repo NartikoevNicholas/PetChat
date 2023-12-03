@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker
 )
 
-from src.services import abstract_interfase
+from src.services import abstract_interface
 
 
 class AbstractUOW(abc.ABC):
@@ -49,17 +49,17 @@ class SQLAlchemyAdapterUOW(AbstractUOW, abc.ABC):
 
 
 class AbstractMemoryStorageUOW(AbstractUOW, abc.ABC):
-    storage: abstract_interfase.AbstractMemoryStorage
+    storage: abstract_interface.AbstractMemoryStorage
 
 
 class AbstractBrokerUOW(AbstractUOW, abc.ABC):
-    broker: abstract_interfase.AbstractBroker
+    broker: abstract_interface.AbstractBroker
 
 
 class AbstractUserServiceRepositoryUOW(SQLAlchemyAdapterUOW, abc.ABC):
-    user: abstract_interfase.AbstractUserRepository
-    user_history: abstract_interfase.AbstractUserHistoryRepository
+    user: abstract_interface.AbstractUserRepository
+    user_history: abstract_interface.AbstractUserHistoryRepository
 
 
 class AbstractAuthServiceRepositoryUOW(SQLAlchemyAdapterUOW, abc.ABC):
-    user: abstract_interfase.AbstractUserRepository
+    user: abstract_interface.AbstractUserRepository

@@ -1,4 +1,4 @@
-from src.services.abstract_interfase import (
+from src.services.abstract_interface import (
     AbstractUserRepository,
     AbstractUserHistoryRepository
 )

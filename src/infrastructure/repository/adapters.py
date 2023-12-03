@@ -26,7 +26,7 @@ from src.endpoints.exceptions import (
     DuplicateUserEmailHTTPException,
     DuplicateUserUsernameHTTPException
 )
-from src.services.abstract_interfase import AbstractRepository
+from src.services.abstract_interface import AbstractRepository
 
 
 class SQLAlchemyAdapter(AbstractRepository, abc.ABC):

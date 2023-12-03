@@ -3,7 +3,6 @@ import asyncio
 from uuid import uuid4
 
 import pytest
-
 from mock import AsyncMock
 from httpx import AsyncClient
 from alembic.config import Config

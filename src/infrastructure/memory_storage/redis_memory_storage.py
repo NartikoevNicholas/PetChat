@@ -1,7 +1,7 @@
 from redis.asyncio import Redis
 from redis.asyncio.client import Pipeline
 
-from src.services.abstract_interfase import (
+from src.services.abstract_interface import (
     SetType,
     AbstractMemoryStorage,
     AbstractReadlockMemoryStorage
