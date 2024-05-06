@@ -4,7 +4,7 @@ from .logger_middleware import LoggerMiddleware
 
 
 middlewares = [
-    RateLimiterMiddleware,
+    # RateLimiterMiddleware,
     LoggerMiddleware
 ]
 

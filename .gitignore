@@ -82,11 +82,7 @@ profile_default/
 ipython_config.py
 
 # certbot
-accounts
-archive
-live
-renewal
-renewal-hooks
+certbot/conf/*
 
 # pyenv
 .python-version
@@ -96,6 +92,8 @@ renewal-hooks
 #   having no cross-platform support, pipenv may install dependencies that don't work, or not
 #   install all needed dependencies.
 #Pipfile.lock
+
+elastic/elasticsearch/data/*
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
 __pypackages__/

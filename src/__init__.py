@@ -32,7 +32,7 @@ def get_application(settings: DefaultSettings = None) -> FastAPI:
     container = Container()
     container.config.from_dict(settings.model_dump())
     bind_routers(app)
-    bind_middlewares(app)
+    # bind_middlewares(app)
     return app
 
 

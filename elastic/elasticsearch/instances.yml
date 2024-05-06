@@ -1,0 +1,4 @@
+instances:
+  - name: kibana
+  - name: elasticsearch
+  - name: logstash

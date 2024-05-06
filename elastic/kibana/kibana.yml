@@ -1,0 +1,20 @@
+server:
+  name: kibana
+  host: "0.0.0.0"
+  shutdownTimeout: "5s"
+  basePath: /kibana
+  rewriteBasePath: false
+
+elasticsearch:
+  hosts: [ "https://elasticsearch:9200" ]
+  username: kibana_system
+  password: "bSqoRtwFdnL9575_C08a"
+  ssl.certificateAuthorities: config/certs/ca/ca.crt
+
+xpack:
+  screenshotting.browser.chromium.disableSandbox: true
+  encryptedSavedObjects.encryptionKey: 4a237301c7eff96a5e1d2e5b93f62a61
+  reporting.encryptionKey: 850063eabb4d74fc55ab92e6a31bfe5f
+  security.encryptionKey: b435a162700dc0872eb902ee263f9243
+  reporting.kibanaServer.hostname: localhost
+  reporting.roles.enabled: false

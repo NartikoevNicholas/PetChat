@@ -1,0 +1,9 @@
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name ${APPLICATION_DOMAIN};
+
+    location /kibana/ {
+        proxy_pass http://kibana:5601/;
+    }
+}
